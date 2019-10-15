@@ -106,23 +106,22 @@ string DES(string str_plText, plainTextMode plMode, string key,
         bitset<SIZE_INPUT>  plaintext(sub_binary);
         bitset<SIZE_OUTPUT> ciphertext;
         
-        //  ECBģʽ
-        if( enMode == ECB ){
-        	myDES(plaintext, Ki, ciphertext, opMode);
+		//  ECBģʽ
+		if( enMode == ECB ){
+			myDES(plaintext, Ki, ciphertext, opMode);
 		}
 		//  CBCģʽ
-		else if( enMode == CBC ){
-		    if( opMode == ENCODE )
-		        plaintext ^= IV;
-		        
-        	myDES(plaintext, Ki, ciphertext, opMode);
-        	
-		    if( opMode == ENCODE )
-		        IV = ciphertext;
-		    else{
-		        ciphertext ^= IV;
-		        IV = plaintext;
-		    }
+		else if( enMode == CBC )
+		{
+			if( opMode == ENCODE )
+				plaintext ^= IV;
+			myDES(plaintext, Ki, ciphertext, opMode);
+			if( opMode == ENCODE )
+				IV = ciphertext;
+			else{
+				ciphertext ^= IV;
+				IV = plaintext;
+			}
 		}
 
         cout << "plaintext  : " << plaintext  << endl;

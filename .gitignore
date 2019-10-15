@@ -1,4 +1,5 @@
 .vscode
+/proj/*.layout
 /proj/*.o
 /proj/*.exe
 /proj/*.dev
