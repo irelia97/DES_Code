@@ -85,31 +85,6 @@ void myDES(bitset<SIZE_INPUT>& plaintext, bitset<SIZE_SONKEY> Ki[],
     DES_Permutation(res, ciphertext, FinalPerm_Table, SIZE_OUTPUT);
 }
 
-string DES_ECB(string str_binaryPlText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
-	operateMode opMode)
-{
-    bitset<SIZE_INPUT> IV(string("1010001010111011001110001010011011100110110111001100110111011111"));
-    //  密文二进制流输出
-    string str_binaryCpText = "";
-    for(int i = 0; i < str_binaryPlText.size(); i += SIZE_INPUT)
-    {
-        //  每次截取64bit明文进行加密
-        string sub_binary = str_binaryPlText.substr(i, SIZE_INPUT);
-        bitset<SIZE_INPUT>  plaintext(sub_binary);
-        bitset<SIZE_OUTPUT> ciphertext;
-        
-        
-        myDES(plaintext, Ki, ciphertext, opMode);
-
-        cout << "plaintext  : " << plaintext  << endl;
-        cout << "ciphertext : " << ciphertext << endl << endl;
-        //  64bit明文加密后的密文累加
-        str_binaryCpText += ciphertext.to_string();
-    }
-    //  返回密文十六进制
-    return strBinary_To_hex(str_binaryCpText);
-}
-
 string DES(string str_plText, plainTextMode plMode, string key,
 	operateMode opMode, encodeMode enMode)
 {
