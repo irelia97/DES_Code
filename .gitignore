@@ -1,3 +1,4 @@
-*.o
-*.exe
-*.dev
+.vscode
+/proj/*.o
+/proj/*.exe
+/proj/*.dev
