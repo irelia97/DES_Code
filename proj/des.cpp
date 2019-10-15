@@ -92,7 +92,7 @@ string DES(string str_plText, plainTextMode plMode, string key,
 	bitset<SIZE_INPUT> IV(string("1010001010111011001110001010011011100110110111001100110111011111"));
 	//  获取密钥组 Ki[]
 	bitset<SIZE_SONKEY> Ki[NUM_SONKEY];
-    getKeyTable(bitset<SIZE_INPUT>(key), Ki);
+	getKeyTable(bitset<SIZE_INPUT>(key), Ki);
     //  8字节为一组，不足的填充0
     strFillZero(str_plText, plMode);
     //	获取明文的二进制流
@@ -101,10 +101,10 @@ string DES(string str_plText, plainTextMode plMode, string key,
     string str_binaryCpText = "";
     for(int i = 0; i < str_binaryPlText.size(); i += SIZE_INPUT)
     {
-        //  每次截取64bit明文进行加密
-        string sub_binary = str_binaryPlText.substr(i, SIZE_INPUT);
-        bitset<SIZE_INPUT>  plaintext(sub_binary);
-        bitset<SIZE_OUTPUT> ciphertext;
+		//  每次截取64bit明文进行加密
+		string sub_binary = str_binaryPlText.substr(i, SIZE_INPUT);
+		bitset<SIZE_INPUT>  plaintext(sub_binary);
+		bitset<SIZE_OUTPUT> ciphertext;
         
 		//  ECB模式
 		if( enMode == ECB ){
