@@ -52,7 +52,11 @@ string strHex_To_strBinary(const string& str_hex)
     for(Byte i = 0; i < str_hex.size(); ++i)
     {
         Byte ch = str_hex[i];
-        Byte x  = (ch < 'A') ? (ch-'0') : (ch-'A'+10);
+        Byte x;
+        if( ch>='0' && ch<='9' ) x = ch - '0';
+        else if( ch>='a' && ch<='f' ) x = ch - 'a' + 10;
+        else if( ch>='A' && ch<='F' ) x = ch - 'A' + 10;
+		else x = 0;
         bitset<4> bs(x);
         str += bs.to_string();
     }

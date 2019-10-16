@@ -1,9 +1,22 @@
 #pragma once
 
 #include <iostream>
-#include <cstdio>
+#include <algorithm>    //  transform函数令模式强制转大写
 #include "constvar.h"
 #include "strConversion.h"
+
+string        _getPlText();
+plainTextMode _getPlMode();
+operateMode   _getOpMode();
+encodeMode    _getEnMode();
+
+void getKeyTable(const bitset<SIZE_INPUT>& key, bitset<SIZE_SONKEY> Ki[]);
+
+void myDES(bitset<SIZE_INPUT>& plaintext, bitset<SIZE_SONKEY> Ki[],
+    bitset<SIZE_OUTPUT>& ciphertext, operateMode opMode);
+
+string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
+	operateMode opMode, encodeMode enMode);
 
 //  要特别注意的是bitset的index由0->size-1是从 低位->高位，即右边->左边
 //  置换操作模板函数
@@ -26,14 +39,3 @@ void DES_LeftRotation(Input& bs, Byte count)
         bs[0] = bit;
     }
 }
-
-void getKeyTable(const bitset<SIZE_INPUT>& key, bitset<SIZE_SONKEY> Ki[]);
-
-void myDES(bitset<SIZE_INPUT>& plaintext, bitset<SIZE_SONKEY> Ki[],
-    bitset<SIZE_OUTPUT>& ciphertext, operateMode opMode);
-
-string DES(string str_plText, plainTextMode plMode, string key,
-	operateMode opMode, encodeMode enMode);
-
-
-

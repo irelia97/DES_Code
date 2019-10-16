@@ -1,5 +1,70 @@
 #include "des.h"
 
+string _getPlText()
+{
+	string str_plText;
+	cout << "请输入明文：";
+	cin  >> str_plText;
+	return str_plText;
+}
+
+plainTextMode _getPlMode()
+{
+	string plMode;
+	cout << "请输入明文模式(TEXT, BINARY, HEX)：";
+	cin  >> plMode;
+	transform(plMode.begin(), plMode.end(), plMode.begin(), ::toupper);
+
+	if( plMode == "BINARY" ){
+		cout << "（选择了BINARY模式！）" << endl;
+		return BINARY;
+	}else if( plMode == "HEX" ){
+		cout << "（选择了HEX模式！）" << endl;
+		return HEX;
+	}else{
+		cout << "（选择了TEXT模式！）" << endl;
+		return TEXT;
+	}
+}
+
+operateMode _getOpMode()
+{
+	string  opMode;
+	cout << "请输入工作模式(ENCODE, DECODE)：";
+	cin  >> opMode;
+	transform(opMode.begin(), opMode.end(), opMode.begin(), ::toupper);
+
+	if( opMode == "ENCODE" ){
+		cout << "（选择了加密模式！）"  << endl;
+		return ENCODE;
+	}else{
+		cout << "（选择了解密模式！）" << endl;
+		return DECODE;
+	}
+}
+
+encodeMode  _getEnMode()
+{
+	string enMode;
+	cout << "请输入加密模式(ECB, CBC, CFB, OFB)：";
+	cin  >> enMode;
+	transform(enMode.begin(), enMode.end(), enMode.begin(), ::toupper);
+
+	if( enMode == "CBC" ){
+		cout << "（选择了CBC模式！）" << endl;
+		return CBC;
+	}else if( enMode == "CFB" ){
+		cout << "（选择了CFB模式！）" << endl;
+		return CFB;
+	}else if( enMode == "OFB" ){
+		cout << "（选择了OFB模式！）" << endl;
+		return OFB;
+	}else{
+		cout << "（选择了ECB模式！）" << endl;
+		return ECB;
+	}
+}
+
 void getKeyTable(const bitset<SIZE_INPUT>& key, bitset<SIZE_SONKEY> Ki[])
 {
     //  交换生成56bit的K
@@ -23,6 +88,7 @@ void getKeyTable(const bitset<SIZE_INPUT>& key, bitset<SIZE_SONKEY> Ki[])
         DES_Permutation(bs_merge, Ki[i], PC_Table2, SIZE_SONKEY);
         cout << "K[" << i+1 << "] = " << Ki[i] << endl;
     }
+    cout << endl;
 }
 
 //  true 加密， false 解密
@@ -85,14 +151,11 @@ void myDES(bitset<SIZE_INPUT>& plaintext, bitset<SIZE_SONKEY> Ki[],
     DES_Permutation(res, ciphertext, FinalPerm_Table, SIZE_OUTPUT);
 }
 
-string DES(string str_plText, plainTextMode plMode, string key,
+string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
 	operateMode opMode, encodeMode enMode)
 {
 	//  初始 IV
 	bitset<SIZE_INPUT> IV(string("1010001010111011001110001010011011100110110111001100110111011111"));
-	//  获取密钥组 Ki[]
-	bitset<SIZE_SONKEY> Ki[NUM_SONKEY];
-	getKeyTable(bitset<SIZE_INPUT>(key), Ki);
     //  8字节为一组，不足的填充0
     strFillZero(str_plText, plMode);
     //	获取明文的二进制流
@@ -106,11 +169,12 @@ string DES(string str_plText, plainTextMode plMode, string key,
 		bitset<SIZE_INPUT>  plaintext(sub_binary);
 		bitset<SIZE_OUTPUT> ciphertext;
 
-		//  ECB模式
+		cout << "plaintext  : " << plaintext  << endl;
+		//  ECB 电子密本模式
 		if( enMode == ECB ){
 			myDES(plaintext, Ki, ciphertext, opMode);
 		}
-		//  CBC模式
+		//  CBC 密文分组链接模式
 		else if( enMode == CBC )
 		{
 			if( opMode == ENCODE )
@@ -123,11 +187,24 @@ string DES(string str_plText, plainTextMode plMode, string key,
 				IV = plaintext;
 			}
 		}
-
-		cout << "plaintext  : " << plaintext  << endl;
+        //  CFB 密文反馈模式
+        else if( enMode == CFB ){
+        	//  CFB模式加/解密时使用密钥Ki的顺序一致
+            myDES(IV, Ki, ciphertext, ENCODE);
+            ciphertext ^= plaintext;
+            IV = ciphertext;
+        }
+        //  OFB 输出反馈模式
+        else if( enMode == OFB ){
+        	//  OFB模式加/解密时使用密钥Ki的顺序一致
+            myDES(IV, Ki, ciphertext, ENCODE);
+            IV = ciphertext;
+            ciphertext ^= plaintext;
+        }
 		cout << "ciphertext : " << ciphertext << endl << endl;
+
 		//  64bit明文加密后的密文累加
-		str_binaryCpText += ciphertext.to_string();
+        str_binaryCpText += ciphertext.to_string();
     }
     
     return strBinary_To_hex(str_binaryCpText);
