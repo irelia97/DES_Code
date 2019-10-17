@@ -1,10 +1,14 @@
+/*
+	è¿™æ˜¯å®ç°DESç®—æ³•ECBå’ŒCBCçš„åˆå§‹ç‰ˆæœ¬ï¼Œå®Œæ•´ç‰ˆæœ¬åœ¨projæ–‡ä»¶å¤¹ä¸­
+*/
+
 #include <iostream>
 #include <bitset> 
 #include <vector>
 #include <string>
 #include <cstdio>
 using namespace std;
-//  ÒªÌØ±ğ×¢ÒâµÄÊÇbitsetµÄindexÓÉ0->size-1ÊÇ´Ó µÍÎ»->¸ßÎ»£¬¼´ÓÒ±ß->×ó±ß
+//  è¦ç‰¹åˆ«æ³¨æ„çš„æ˜¯bitsetçš„indexç”±0->size-1æ˜¯ä» ä½ä½->é«˜ä½ï¼Œå³å³è¾¹->å·¦è¾¹
 
 typedef unsigned char Byte;
 
@@ -14,10 +18,10 @@ const Byte SIZE_DIVIDE = 28;
 const Byte NUM_SONKEY  = 16;
 const Byte SIZE_SONKEY = 48;
 
-enum plainTextMode {TEXT, BINARY, HEX}; //  Ã÷ÎÄÄ£Ê½£ºÎÄ±¾£¬¶ş½øÖÆ£¬Ê®Áù½øÖÆ
-enum operateMode   {ENCODE, DECODE};    //  ¹¤×÷Ä£Ê½£º¼ÓÃÜ£¬½âÃÜ
+enum plainTextMode {TEXT, BINARY, HEX}; //  æ˜æ–‡æ¨¡å¼ï¼šæ–‡æœ¬ï¼ŒäºŒè¿›åˆ¶ï¼Œåå…­è¿›åˆ¶
+enum operateMode   {ENCODE, DECODE};    //  å·¥ä½œæ¨¡å¼ï¼šåŠ å¯†ï¼Œè§£å¯†
 
-// ³õÊ¼ÖÃ»»±í64bit
+// åˆå§‹ç½®æ¢è¡¨64bit
 const Byte InitPerm_Table[]  = {   
     58, 50, 42, 34, 26, 18, 10, 2,
     60, 52, 44, 36, 28, 20, 12, 4,
@@ -29,7 +33,7 @@ const Byte InitPerm_Table[]  = {
     63, 55, 47, 39, 31, 23, 15, 7
 };
 
-// Ñ¡ÔñÖÃ»»±í1£¬28*2 bit£¬ÆäÖĞÎ´³öÏÖµÄ 8,16,24,32,40,48,56,64×öÆæÅ¼Ğ£ÑéÎ»
+// é€‰æ‹©ç½®æ¢è¡¨1ï¼Œ28*2 bitï¼Œå…¶ä¸­æœªå‡ºç°çš„ 8,16,24,32,40,48,56,64åšå¥‡å¶æ ¡éªŒä½
 const Byte PC_Table1[]   = {     
     //  Ci
     57, 49, 41, 33, 25, 17,  9,  
@@ -42,7 +46,7 @@ const Byte PC_Table1[]   = {
     14,  6, 61, 53, 45, 37, 29, 
     21, 13,  5, 28, 20, 12,  4    
 };
-// Ñ¡ÔñÖÃ»»±í2£¬6*8 bit
+// é€‰æ‹©ç½®æ¢è¡¨2ï¼Œ6*8 bit
 const Byte PC_Table2[] = {
     14, 17, 11, 24,  1,  5,  3, 28, 
     15,  6, 21, 10, 23, 19, 12,  4, 
@@ -51,11 +55,11 @@ const Byte PC_Table2[] = {
     51, 45, 33, 48, 44, 49, 39, 56, 
     34, 53, 46, 42, 50, 36, 29, 32
 };
-//  ×óÒÆÎ»Êı±í
+//  å·¦ç§»ä½æ•°è¡¨
 const Byte LeftMove_Table[] = {
     1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
 };
-//  À©Õ¹±í
+//  æ‰©å±•è¡¨
 const Byte Expansion_Table[] = {
     32,  1,  2,  3,  4,  5,
     4,   5,  6,  7,  8,  9,
@@ -66,7 +70,7 @@ const Byte Expansion_Table[] = {
     24, 25, 26, 27, 28, 29,
     28, 29, 30, 31, 32, 1
 };
-//  SºĞ£¬³öÓÚ¼ò»¯Ö»ÓÃÒ»¸ö
+//  Sç›’ï¼Œå‡ºäºç®€åŒ–åªç”¨ä¸€ä¸ª
 const Byte SBox_Table[][4][16] = {
     {
         {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
@@ -117,7 +121,7 @@ const Byte SBox_Table[][4][16] = {
         {2,1,14,7,4,10,8,13,15,12,9,0,3,5,6,11},
     }  
 };
-//  PºĞ
+//  Pç›’
 const Byte PBox_Table[] = {
     16, 7,  20, 21, 29, 12, 28, 17, 
     1,  15, 23, 26, 5,  18, 31, 10,
@@ -125,7 +129,7 @@ const Byte PBox_Table[] = {
     19, 13, 30, 6,  22, 11, 4,  25    
 };
 
-// Äæ³õÊ¼ÖÃ»»±í64bit
+// é€†åˆå§‹ç½®æ¢è¡¨64bit
 const Byte FinalPerm_Table[] = {   
     40, 8, 48, 16, 56, 24, 64, 32, 
     39, 7, 47, 15, 55, 23, 63, 31,
@@ -137,7 +141,7 @@ const Byte FinalPerm_Table[] = {
     33, 1, 41,  9, 49, 17, 57, 25
 };
 
-//  ÖÃ»»²Ù×÷Ä£°åº¯Êı
+//  ç½®æ¢æ“ä½œæ¨¡æ¿å‡½æ•°
 template <class Input, class Output>
 void DES_Permutation(const Input& input, Output& output
         , const Byte Table[], const Byte tableSize)
@@ -146,7 +150,7 @@ void DES_Permutation(const Input& input, Output& output
         output[tableSize - i - 1] = input[input.size() - Table[i]];
 }
 
-//  Ğı×ª×óÒÆ
+//  æ—‹è½¬å·¦ç§»
 template <class Input>
 void DES_LeftRotation(Input& bs, Byte count)
 {
@@ -160,82 +164,82 @@ void DES_LeftRotation(Input& bs, Byte count)
 
 void getKeyTable(const bitset<SIZE_INPUT>& key, bitset<SIZE_SONKEY> Ki[])
 {
-    //  ½»»»Éú³É56bitµÄK
+    //  äº¤æ¢ç”Ÿæˆ56bitçš„K
     bitset<SIZE_DIVIDE*2> K;
     DES_Permutation(key, K, PC_Table1, SIZE_DIVIDE*2);
     string str_K = K.to_string();
-    //  Ñ¡ÔñÖÃ»»Éú³É³õÊ¼C0, D0
-    cout << "Ñ¡ÔñÖÃ»»Éú³É³õÊ¼C0, D0" << endl;    
+    //  é€‰æ‹©ç½®æ¢ç”Ÿæˆåˆå§‹C0, D0
+    cout << "é€‰æ‹©ç½®æ¢ç”Ÿæˆåˆå§‹C0, D0" << endl;    
     bitset<SIZE_DIVIDE> Ci(str_K.substr(0, SIZE_DIVIDE));
     bitset<SIZE_DIVIDE> Di(str_K.substr(SIZE_DIVIDE));
     cout << Ci << endl << Di << endl << endl;
 
-    //  Éú³É16¸ö×ÓÃÜÔ¿
-    cout << "Éú³É16¸ö×ÓÃÜÔ¿" << endl;
+    //  ç”Ÿæˆ16ä¸ªå­å¯†é’¥
+    cout << "ç”Ÿæˆ16ä¸ªå­å¯†é’¥" << endl;
     for(Byte i = 0; i < NUM_SONKEY; ++i){
-        //  Ğı×ª×óÒÆ
+        //  æ—‹è½¬å·¦ç§»
         DES_LeftRotation(Ci, LeftMove_Table[i]);
         DES_LeftRotation(Di, LeftMove_Table[i]);     
-        //  ºÏ²¢ÖÃ»»
+        //  åˆå¹¶ç½®æ¢
         bitset<2*SIZE_DIVIDE> bs_merge(Ci.to_string() + Di.to_string());
         DES_Permutation(bs_merge, Ki[i], PC_Table2, SIZE_SONKEY);
         cout << "K[" << i+1 << "] = " << Ki[i] << endl;
     }
 }
 
-//  true ¼ÓÃÜ£¬ false ½âÃÜ
+//  true åŠ å¯†ï¼Œ false è§£å¯†
 void myDES(bitset<SIZE_INPUT>& plaintext, bitset<SIZE_SONKEY> Ki[], 
     bitset<SIZE_OUTPUT>& ciphertext, operateMode opMode, bitset<SIZE_INPUT>& IV)
 {
     if( opMode == ENCODE )
         plaintext ^= IV;
-    //  Ã÷ÎÄ³õÊ¼ÖÃ»»
+    //  æ˜æ–‡åˆå§‹ç½®æ¢
     bitset<SIZE_OUTPUT> IP;
-    cout << "³õÊ¼ÖÃ»»" << endl;
+    cout << "åˆå§‹ç½®æ¢" << endl;
     cout << "data : " << plaintext << endl;    
     DES_Permutation(plaintext, IP, InitPerm_Table, SIZE_INPUT);
     cout << "IP:    " << IP << endl << endl;
-    //  Éú³É³õÊ¼L0, R0
+    //  ç”Ÿæˆåˆå§‹L0, R0
     string str_IP = IP.to_string();
     bitset<SIZE_INPUT/2> Li(str_IP.substr(0, SIZE_INPUT/2)), tmpL;
     bitset<SIZE_INPUT/2> Ri(str_IP.substr(SIZE_INPUT/2))   , tmpR;
     //cout << "L0 : " << Li << endl;
     //cout << "R0 : " << Ri << endl << endl;
-    //  16´Î¼ÓÃÜ
+    //  16æ¬¡åŠ å¯†
     for(Byte i = 0; i < NUM_SONKEY; ++i){
         tmpL = Li; tmpR = Ri;
         //cout << "Li : " << Li << endl;
         //cout << "Ri : " << Ri << endl;
-        bitset<SIZE_SONKEY> Ei; //  ±£´æÖĞ¼ä½á¹û
-        //  À©Õ¹ÖÁ48bit±£´æÖÁEi
+        bitset<SIZE_SONKEY> Ei; //  ä¿å­˜ä¸­é—´ç»“æœ
+        //  æ‰©å±•è‡³48bitä¿å­˜è‡³Ei
         DES_Permutation(Ri, Ei, Expansion_Table, SIZE_SONKEY);
-        //  ÓëÃÜÔ¿KiÒì»ò
+        //  ä¸å¯†é’¥Kiå¼‚æˆ–
         if( opMode == ENCODE ) Ei ^= Ki[i];
         else Ei ^= Ki[15 - i];
         //cout << "E" << i+1 << " : " << Ei << "  ";
-        //  resÔİ´æ×ª»¯ºóµÄ×Ö·û´®
-        //  ×ª»¯Ê±ÒÔ6Î»Îª1×é£¬Ó³Éäµ½SºĞ
+        //  resæš‚å­˜è½¬åŒ–åçš„å­—ç¬¦ä¸²
+        //  è½¬åŒ–æ—¶ä»¥6ä½ä¸º1ç»„ï¼Œæ˜ å°„åˆ°Sç›’
         string res = "";
         for(Byte j = 0; j < SIZE_SONKEY; j += 6){
             string str_col = Ei.to_string().substr(j+1, 4);
-            //  ×ª»¯ĞĞ¡¢ÁĞ
+            //  è½¬åŒ–è¡Œã€åˆ—
             Byte row = Ei[SIZE_SONKEY-j-1]*2 + Ei[SIZE_SONKEY-j-6];
             Byte col = bitset<4>(str_col).to_ulong();
             //printf("(%d,%d)", row, col);
-            //  »ñÈ¡S-BOXµÄÖµ
+            //  è·å–S-BOXçš„å€¼
             Byte value = SBox_Table[j/6][row][col];
             //printf("%d  ", value);
             res += bitset<4>(value).to_string();
         }
         //cout << endl;
         //cout << "S" << i+1 << " : " << res << endl;
-        //  ÔÙ×ª»»»Ø32bit
+        //  å†è½¬æ¢å›32bit
         bitset<32> bs_tmp(res);
-        //  PºĞÖÃ»»
+        //  Pç›’ç½®æ¢
         DES_Permutation(bs_tmp, Ri, PBox_Table, SIZE_INPUT/2);
         Ri ^= tmpL;
         //cout << "R" << i+1 << " : " << Ri << endl << endl;
-        //  ×îºóÒ»ÂÖ²»ÓÃÔÙ½»»»
+        //  æœ€åä¸€è½®ä¸ç”¨å†äº¤æ¢
         Li  = tmpR; 
     }
     cout << "L16 : " << Li << endl;
@@ -316,11 +320,11 @@ string strHex_To_strBinary(const string& str_hex)
 string DES_ECB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[], operateMode opMode)
 {
     bitset<SIZE_INPUT> IV(string("1010001010111011001110001010011011100110110111001100110111011111"));
-    //  Ìî³ä0
+    //  å¡«å……0
     strFillZero(str_plText, plMode);
-    //  Ô­ÓĞÃ÷ÎÄ
+    //  åŸæœ‰æ˜æ–‡
     cout << "str_plText : " << str_plText << endl;
-    //  ÈôÎªÎÄ±¾»òÊ®Áù½øÖÆ£¬×ª»»Îª¶ÔÓ¦µÄ¶ş½øÖÆÁ÷
+    //  è‹¥ä¸ºæ–‡æœ¬æˆ–åå…­è¿›åˆ¶ï¼Œè½¬æ¢ä¸ºå¯¹åº”çš„äºŒè¿›åˆ¶æµ
     string str_binaryPlText;
     if( plMode == TEXT )
         str_binaryPlText = str_To_strBinary(str_plText);
@@ -328,14 +332,14 @@ string DES_ECB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[]
         str_binaryPlText = strHex_To_strBinary(str_plText);
     else
         str_binaryPlText = str_plText;
-    //  Ô­ÓĞÃ÷ÎÄ¶ş½øÖÆºÍÊ®Áù½øÖÆ
+    //  åŸæœ‰æ˜æ–‡äºŒè¿›åˆ¶å’Œåå…­è¿›åˆ¶
     cout << "str_binaryPlText : " << str_binaryPlText << endl;
     cout << "str_plHexText : " << strBinary_To_hex(str_binaryPlText) << endl;
-    //  ÃÜÎÄ¶ş½øÖÆÁ÷Êä³ö
+    //  å¯†æ–‡äºŒè¿›åˆ¶æµè¾“å‡º
     string str_binaryCpText = "";
     for(int i = 0; i < str_binaryPlText.size(); i += 64)
     {
-        //  Ã¿´Î½ØÈ¡64bitÃ÷ÎÄ½øĞĞ¼ÓÃÜ
+        //  æ¯æ¬¡æˆªå–64bitæ˜æ–‡è¿›è¡ŒåŠ å¯†
         string sub_binary = str_binaryPlText.substr(i, 64);
         bitset<64> plaintext(sub_binary);
         bitset<64> ciphertext;
@@ -343,10 +347,10 @@ string DES_ECB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[]
 
         cout << "plaintext  : " << plaintext  << endl;
         cout << "ciphertext : " << ciphertext << endl << endl;
-        //  64bitÃ÷ÎÄ¼ÓÃÜºóµÄÃÜÎÄÀÛ¼Ó
+        //  64bitæ˜æ–‡åŠ å¯†åçš„å¯†æ–‡ç´¯åŠ 
         str_binaryCpText += ciphertext.to_string();
     }
-    //  ·µ»ØÃÜÎÄÊ®Áù½øÖÆ
+    //  è¿”å›å¯†æ–‡åå…­è¿›åˆ¶
     return strBinary_To_hex(str_binaryCpText);
 }
 
