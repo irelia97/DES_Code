@@ -17,6 +17,8 @@ void myDES(bitset<SIZE_INPUT>& plaintext, bitset<SIZE_SONKEY> Ki[],
 
 string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
 	operateMode opMode, encodeMode enMode);
+	
+string DES_CFB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[], operateMode opMode);
 
 //  要特别注意的是bitset的index由0->size-1是从 低位->高位，即右边->左边
 //  置换操作模板函数

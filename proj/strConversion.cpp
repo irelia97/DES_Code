@@ -1,18 +1,29 @@
 #include "strConversion.h"
 
-void strFillZero(string& str, plainTextMode plMode)
+int strFillZero(string& str, plainTextMode plMode)
 {
     int p;
     if( plMode == BINARY )   p = 64;
     else if( plMode == HEX ) p = 16;
     else if( plMode == TEXT) p = 8;
 
-    int size = str.size() / p;
+	int fill;   //  填充 二进制0 的个数
+    int size = str.size() / p;  //  块的个数
     if( p*size != str.size() )
-        if( plMode == BINARY )
-            str += string(p*(size+1) - str.size(),  '0');
-        else
-            str += string(p*(size+1) - str.size(), '\0');
+	{
+		fill = p*(size+1) - str.size();
+        if( plMode == TEXT ){
+            str += string(fill, '\0');
+            fill *= 8;
+		}else if( plMode == HEX ){
+            str += string(fill, '0');
+            fill *= 4;
+		}else if( plMode == BINARY ){
+			str += string(fill, '0');
+			fill *= 1;
+		}
+	}
+	return fill;
 }
 
 string str_To_strBinary(const string& str)

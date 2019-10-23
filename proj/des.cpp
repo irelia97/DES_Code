@@ -157,7 +157,7 @@ string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
 	//  初始 IV
 	bitset<SIZE_INPUT> IV(string("1010001010111011001110001010011011100110110111001100110111011111"));
     //  8字节为一组，不足的填充0
-    strFillZero(str_plText, plMode);
+    int fillSize = strFillZero(str_plText, plMode);
     //	获取明文的二进制流
     string str_binaryPlText = getStrBinary(str_plText, plMode);
     //  密文二进制流输出
@@ -207,5 +207,50 @@ string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
         str_binaryCpText += ciphertext.to_string();
     }
     
+    //  OFB模式需要舍去填充的位
+    if( enMode == OFB ){
+    	int size = str_binaryCpText.size();
+    	str_binaryCpText = str_binaryCpText.substr(0, size - fillSize);
+	}
+    return strBinary_To_hex(str_binaryCpText);
+}
+
+//  CFB一次操作的是流密码(8位)，与其它模式冲突
+//  强行抽象需要写很多的判断，故单独写一个函数
+string DES_CFB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[]
+    , operateMode opMode)
+{
+	//  初始 IV
+	bitset<SIZE_INPUT> IV(string("1010001010111011001110001010011011100110110111001100110111011111"));
+    //	获取明文的二进制流
+    string str_binaryPlText = getStrBinary(str_plText, plMode);
+    //  8位补齐
+    int size = str_binaryPlText.size() / 8;
+    if( 8*size != str_binaryPlText.size() )
+    	str_binaryPlText += string((size+1)*8 - str_binaryPlText.size(), '0');
+    cout << "str_binaryPlText.size() = " << str_binaryPlText.size() << endl;
+    //  密文二进制流输出
+    string str_binaryCpText = "";
+    for(int i = 0; i < str_binaryPlText.size(); i += 8)
+    {
+		//  每次截取8bit明文进行加密
+		string sub_binary = str_binaryPlText.substr(i, 8);
+		bitset<8>  plaintext(sub_binary);
+		bitset<SIZE_OUTPUT> IV_DES;
+		cout << "plaintext  : " << plaintext  << endl;
+		
+		myDES(IV, Ki, IV_DES, ENCODE);
+        bitset<8> ciphertext(IV_DES.to_string().substr(0, 8));
+        ciphertext ^= plaintext;
+
+        cout << "ciphertext : " << ciphertext << endl << endl;
+        str_binaryCpText += ciphertext.to_string();
+
+        IV <<= 8;
+        if( opMode == ENCODE )
+            IV |= (bitset<64>(ciphertext.to_string()));
+        else
+            IV |= (bitset<64>(plaintext.to_string()));
+	}
     return strBinary_To_hex(str_binaryCpText);
 }
