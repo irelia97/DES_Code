@@ -187,13 +187,6 @@ string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
 				IV = plaintext;
 			}
 		}
-        //  CFB 密文反馈模式
-        else if( enMode == CFB ){
-        	//  CFB模式加/解密时使用密钥Ki的顺序一致
-            myDES(IV, Ki, ciphertext, ENCODE);
-            ciphertext ^= plaintext;
-            IV = ciphertext;
-        }
         //  OFB 输出反馈模式
         else if( enMode == OFB ){
         	//  OFB模式加/解密时使用密钥Ki的顺序一致
@@ -215,6 +208,7 @@ string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
     return strBinary_To_hex(str_binaryCpText);
 }
 
+//  CFB 密文反馈模式
 //  CFB一次操作的是流密码(8位)，与其它模式冲突
 //  强行抽象需要写很多的判断，故单独写一个函数
 string DES_CFB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[]
