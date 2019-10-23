@@ -199,7 +199,6 @@ string DES(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[],
 		//  64bit明文加密后的密文累加
         str_binaryCpText += ciphertext.to_string();
     }
-    
     //  OFB模式需要舍去填充的位
     if( enMode == OFB ){
     	int size = str_binaryCpText.size();
