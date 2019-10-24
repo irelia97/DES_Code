@@ -67,6 +67,7 @@ encodeMode  _getEnMode()
 
 void getKeyTable(const bitset<SIZE_INPUT>& key, bitset<SIZE_SONKEY> Ki[])
 {
+	cout << "原始密钥：" << key << "\n\n";
     //  交换生成56bit的K
     bitset<SIZE_DIVIDE*2> K;
     DES_Permutation(key, K, PC_Table1, SIZE_DIVIDE*2);
