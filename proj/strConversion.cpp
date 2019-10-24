@@ -7,7 +7,7 @@ int strFillZero(string& str, plainTextMode plMode)
     else if( plMode == HEX ) p = 16;
     else if( plMode == TEXT) p = 8;
 
-	int fill;   //  填充 二进制0 的个数
+	int fill = 0;   //  填充 二进制0 的个数
     int size = str.size() / p;  //  块的个数
     if( p*size != str.size() )
 	{

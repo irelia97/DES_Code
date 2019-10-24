@@ -222,6 +222,7 @@ string DES_CFB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[]
     if( 8*size != str_binaryPlText.size() )
     	str_binaryPlText += string((size+1)*8 - str_binaryPlText.size(), '0');
     cout << "str_binaryPlText.size() = " << str_binaryPlText.size() << endl;
+    
     //  密文二进制流输出
     string str_binaryCpText = "";
     for(int i = 0; i < str_binaryPlText.size(); i += 8)
@@ -241,9 +242,9 @@ string DES_CFB(string str_plText, plainTextMode plMode, bitset<SIZE_SONKEY> Ki[]
 
         IV <<= 8;
         if( opMode == ENCODE )
-            IV |= (bitset<64>(ciphertext.to_string()));
+            IV |= bitset<64>( ciphertext.to_string() );
         else
-            IV |= (bitset<64>(plaintext.to_string()));
+            IV |= bitset<64>( plaintext.to_string()  );
 	}
     return strBinary_To_hex(str_binaryCpText);
 }
